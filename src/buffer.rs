@@ -134,12 +134,14 @@ mod test{
         let mut pool = create_buffer_pool();
         assert_eq!(pool.evict(), Some(BufferId(0)));
         {
-            let _ = Rc::clone(&mut pool[BufferId(0)].buffer);
+            let a = Rc::clone(&mut pool[BufferId(0)].buffer);
             pool[BufferId(0)].usage_count = 1;
             assert_eq!(pool.evict(), Some(BufferId(1)));
-            let _ = Rc::clone(&mut pool[BufferId(1)].buffer);
+            let b = Rc::clone(&mut pool[BufferId(1)].buffer);
             pool[BufferId(1)].usage_count = 1;
             assert_eq!(pool.evict(), None);
+            drop(a);
+            drop(b);
         }
         let _ = Rc::clone(&mut pool[BufferId(1)].buffer);
         assert_eq!(pool.evict(), Some(BufferId(0)));
